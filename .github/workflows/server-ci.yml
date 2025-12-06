@@ -49,24 +49,21 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-asyncio
 
-    - name: Drop and recreate test database
+    - name: Reset database and migrations for CI
       env:
         PGPASSWORD: postgres
       run: |
         cd server
         export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
         export SECRET_KEY="test-secret-key-for-ci"
-        dropdb RepTrack --if-exists -h localhost -U postgres -p 5432
-        createdb RepTrack -h localhost -U postgres -p 5432
+        
+        dropdb RepTrack -h localhost -U postgres --if-exists || true
+        
+        createdb RepTrack -h localhost -U postgres || true
+        
+        alembic stamp head
 
-    - name: Run database migrations
-      run: |
-        cd server
-        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
-        export SECRET_KEY="test-secret-key-for-ci"
-        alembic upgrade head
-
-    - name: Run pytest
+    - name: Run pytest (autogenerate creates tables)
       run: |
         cd server
         export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
