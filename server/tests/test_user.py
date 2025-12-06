@@ -54,4 +54,3 @@ def test_get_user_by_id(client):
 
 
 # TODO: Add test for user not found
-#
