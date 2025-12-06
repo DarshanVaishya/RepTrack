@@ -49,6 +49,16 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-asyncio
 
+    - name: Drop and recreate test database
+      env:
+        PGPASSWORD: postgres
+      run: |
+        cd server
+        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
+        export SECRET_KEY="test-secret-key-for-ci"
+        dropdb RepTrack --if-exists -h localhost -U postgres -p 5432
+        createdb RepTrack -h localhost -U postgres -p 5432
+
     - name: Run database migrations
       run: |
         cd server
