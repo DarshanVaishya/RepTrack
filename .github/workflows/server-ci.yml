@@ -53,10 +53,13 @@ jobs:
       run: |
         cd server
         export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
+        export SECRET_KEY="test-secret-key-for-ci"
         alembic upgrade head
 
     - name: Run pytest
       run: |
         cd server
         export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
+        export SECRET_KEY="test-secret-key-for-ci"
         pytest tests/ -v
+
