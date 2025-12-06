@@ -36,4 +36,5 @@ class UserService:
 
     @staticmethod
     def test():
+        print("test")
         pass
