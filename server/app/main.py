@@ -3,6 +3,8 @@ from app.config import get_settings
 from fastapi import Depends, FastAPI
 from app.database import get_db
 
+from app.routers import user
+
 
 settings = get_settings()
 
@@ -15,3 +17,6 @@ app = FastAPI(
 @app.get("/")
 def test():
     return "Hello, world!"
+
+
+app.include_router(user.router)
