@@ -1,4 +1,5 @@
 def test_create_user(client):
+    """Test to check if creating a user works"""
     response = client.post(
         "/users",
         json={
@@ -17,6 +18,7 @@ def test_create_user(client):
 
 
 def test_get_all_users(client):
+    """Test to check if fetching all users works"""
     client.post(
         "/users",
         json={
@@ -35,6 +37,7 @@ def test_get_all_users(client):
 
 
 def test_get_user_by_id(client):
+    """Test to check if fetching a user works"""
     create_response = client.post(
         "/users",
         json={
@@ -53,4 +56,51 @@ def test_get_user_by_id(client):
     assert data["email"] == "test@example.com"
 
 
-# TODO: Add test for user not found
+def test_duplicate_user(client):
+    """Test to check if creating a user with duplicate email throws an error"""
+    first_response = client.post(
+        "/users",
+        json={
+            "name": "jane doe",
+            "email": "jane@example.com",
+            "password": "password123",
+            "role": "user",
+        },
+    )
+    assert first_response.status_code == 200
+
+    response = client.post(
+        "/users",
+        json={
+            "name": "jane doe",
+            "email": "jane@example.com",
+            "password": "password123",
+            "role": "user",
+        },
+    )
+
+    assert response.status_code == 400
+    data = response.json()
+    assert data["detail"] == "Email already exists"
+
+
+def test_user_not_found(client):
+    """Test to fetch a user that does not exist"""
+    response = client.get("/users/999")
+
+    assert response.status_code == 404
+    data = response.json()
+    assert data["detail"] == "User with id 999 not found."
+
+
+def test_wrong_role(client):
+    response = client.post(
+        "/users",
+        json={
+            "name": "jane doe",
+            "email": "jane@example.com",
+            "password": "password123",
+            "role": "test",
+        },
+    )
+    assert response.status_code == 422
