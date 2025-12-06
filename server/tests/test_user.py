@@ -23,6 +23,7 @@ def test_get_all_users(client):
             "name": "Jane Doe",
             "email": "jane@example.com",
             "password": "password123",
+            "role": "user",
         },
     )
 
