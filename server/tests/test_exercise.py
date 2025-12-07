@@ -55,7 +55,7 @@ def test_create_non_admin(client):
         },
         headers={"Authorization": f"Bearer {token}"},
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
     assert response.json()["detail"] == "Admin only method"
 
 

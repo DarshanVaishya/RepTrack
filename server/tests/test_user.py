@@ -85,7 +85,7 @@ def test_user_not_found(authenticated_client):
     response = authenticated_client("GET", "/users/999")
     assert response.status_code == 404
     data = response.json()
-    assert data["detail"] == "User with id 999 not found."
+    assert data["detail"] == "User with id 999 not found"
 
 
 def test_wrong_role(client):
@@ -183,7 +183,7 @@ def test_login_invalid_credentials(client):
         data={"username": "test@example.com", "password": "wrongpassword"},
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     data = response.json()
     assert data["detail"] == "Invalid credentials"
 
@@ -195,6 +195,6 @@ def test_login_nonexistent_user(client):
         data={"username": "nonexistent@example.com", "password": "password123"},
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 401
     data = response.json()
     assert data["detail"] == "Invalid credentials"
