@@ -15,3 +15,13 @@ class UpdateUserPayload(BaseModel):
     email: str | None = None
     password: str | None = None
     role: UserRole | None = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

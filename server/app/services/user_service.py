@@ -1,9 +1,14 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.user import CreateUserPayload, UpdateUserPayload
-from app.utils.password import hash_password
+from app.schemas.user import CreateUserPayload, TokenResponse, UpdateUserPayload
+from app.utils.password import hash_password, verify_password
 from app.utils.logger import logger
 from app.models.user import User, UserRole
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
+from app.utils.auth import create_access_token
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 # TODO: Add error handling
@@ -84,3 +89,16 @@ class UserService:
         db.delete(user)
         db.commit()
         return user
+
+    @staticmethod
+    def login_user(form_data: OAuth2PasswordRequestForm, db: Session):
+        user = db.query(User).filter(User.email == form_data.username.lower()).first()
+
+        if not user or not verify_password(form_data.password, user.password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid credentials",
+            )
+
+        token = create_access_token({"user": {"email": user.email, "id": user.id}})
+        return TokenResponse(access_token=token)
