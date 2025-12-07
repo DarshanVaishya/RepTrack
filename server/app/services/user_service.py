@@ -1,11 +1,12 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.user import CreateUserPayload
+from app.schemas.user import CreateUserPayload, UpdateUserPayload
 from app.utils.password import hash_password
 from app.utils.logger import logger
 from app.models.user import User, UserRole
 
 
+# TODO: Add error handling
 class UserService:
     @staticmethod
     def create_new_user(user_data: CreateUserPayload, db: Session):
@@ -50,6 +51,31 @@ class UserService:
                 detail=f"User with id {user_id} not found.",
             )
         logger.debug(f"Successfully fetched user - ID: {user_id} Name: {user.name}")
+        return user
+
+    @staticmethod
+    def update_user_details(user_id: int, update_data: UpdateUserPayload, db: Session):
+        logger.debug(f"Updating user - ID: {user_id}")
+        user = UserService.get_user_by_id(user_id, db)
+        update_dict = update_data.model_dump(exclude_unset=True)
+        update_dict["email"] = update_dict["email"].lower()
+
+        fields_to_update = [k for k in update_dict.keys() if k != "password"]
+        if fields_to_update:
+            logger.debug(
+                f"Updating fields for user {user_id}: {', '.join(fields_to_update)}"
+            )
+
+        if "password" in update_dict and update_dict["password"]:
+            logger.debug(f"Password update requested for user {user_id}")
+            update_dict["password"] = hash_password(update_dict["password"])
+
+        for field, value in update_dict.items():
+            setattr(user, field, value)
+
+        db.commit()
+        db.refresh(user)
+        logger.info(f"Successfully updated user - ID: {user_id}, Name: {user.name}")
         return user
 
     @staticmethod

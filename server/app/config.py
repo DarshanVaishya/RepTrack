@@ -3,8 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "Bug Tracker API"
-    app_description: str = "A bug tracking API made with FastAPI"
+    app_name: str = "RepTrack"
+    app_description: str = "Workout and Nutrition tracking API"
 
     database_url: str
     secret_key: str

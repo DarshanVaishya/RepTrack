@@ -104,3 +104,50 @@ def test_wrong_role(client):
         },
     )
     assert response.status_code == 422
+
+
+def test_delete_user(client):
+    first_response = client.post(
+        "/users",
+        json={
+            "name": "John Doe",
+            "email": "John@Example.com",
+            "password": "securepass123",
+            "role": "user",
+        },
+    )
+
+    assert first_response.status_code == 200
+    user_id = first_response.json()["id"]
+
+    response = client.delete(f"/users/{user_id}")
+    assert response.status_code == 200
+
+
+def test_update_user(client):
+    first_response = client.post(
+        "/users",
+        json={
+            "name": "jane doe",
+            "email": "jane@example.com",
+            "password": "password123",
+            "role": "coach",
+        },
+    )
+    assert first_response.status_code == 200
+    user_id = first_response.json()["id"]
+    response = client.put(
+        f"/users/{user_id}",
+        json={
+            "name": "John Doe",
+            "email": "John@Example.com",
+            "password": "securepass123",
+            "role": "user",
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "John Doe"
+    assert data["email"] == "john@example.com"
+    assert data["role"] == "user"

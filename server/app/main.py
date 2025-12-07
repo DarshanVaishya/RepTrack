@@ -13,10 +13,4 @@ app = FastAPI(
     description=settings.app_description,
 )
 
-
-@app.get("/")
-def test():
-    return "Hello, world!"
-
-
 app.include_router(user.router)
