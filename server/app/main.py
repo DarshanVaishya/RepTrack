@@ -3,7 +3,7 @@ from app.config import get_settings
 from fastapi import Depends, FastAPI
 from app.database import get_db
 
-from app.routers import user
+from app.routers import user, exercise
 
 
 settings = get_settings()
@@ -14,3 +14,4 @@ app = FastAPI(
 )
 
 app.include_router(user.router)
+app.include_router(exercise.router)

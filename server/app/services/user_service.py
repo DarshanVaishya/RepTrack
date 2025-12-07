@@ -12,6 +12,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 # TODO: Add error handling
+# TODO: Add format_response method
 class UserService:
     @staticmethod
     def create_new_user(user_data: CreateUserPayload, db: Session):
@@ -63,7 +64,8 @@ class UserService:
         logger.debug(f"Updating user - ID: {user_id}")
         user = UserService.get_user_by_id(user_id, db)
         update_dict = update_data.model_dump(exclude_unset=True)
-        update_dict["email"] = update_dict["email"].lower()
+        if "email" in update_dict.keys():
+            update_dict["email"] = update_dict["email"].lower()
 
         fields_to_update = [k for k in update_dict.keys() if k != "password"]
         if fields_to_update:
@@ -100,5 +102,7 @@ class UserService:
                 detail="Invalid credentials",
             )
 
-        token = create_access_token({"user": {"email": user.email, "id": user.id}})
+        token = create_access_token(
+            {"user": {"email": user.email, "id": user.id, "role": str(user.role)}}
+        )
         return TokenResponse(access_token=token)

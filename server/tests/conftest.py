@@ -29,3 +29,51 @@ def client():
     yield TestClient(app)
     app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture
+def authenticated_client(client):
+    """Fixture that creates user + logs in + returns client with token"""
+    email = "test@example.com"
+    user_response = client.post(
+        "/users",
+        json={
+            "name": "Test User",
+            "email": email,
+            "password": "password123",
+            "role": "admin",
+        },
+    )
+    assert user_response.status_code == 200
+
+    login_response = client.post(
+        "/users/login", data={"username": email, "password": "password123"}
+    )
+    assert login_response.status_code == 200
+    token = login_response.json()["access_token"]
+
+    def auth_request(method, url, **kwargs):
+        kwargs["headers"] = kwargs.get("headers", {})
+        kwargs["headers"]["Authorization"] = f"Bearer {token}"
+        return client.request(method, url, **kwargs)
+
+    return auth_request
+
+
+@pytest.fixture
+def created_exercise(authenticated_client):
+    """Fixture that creates an exercise and returns its ID + client"""
+    create_response = authenticated_client(
+        "POST",
+        "/exercises",
+        json={
+            "name": "Lat Pulldown",
+            "description": "Lat pulldown cable",
+            "muscle_group": "back",
+            "equipment": "cable_machine",
+        },
+    )
+    assert create_response.status_code == 200
+    exercise_id = create_response.json()["id"]
+
+    return authenticated_client, exercise_id
