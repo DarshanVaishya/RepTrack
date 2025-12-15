@@ -10,3 +10,11 @@ class CreateWorkoutSetPayload(BaseModel):
     order_index: int
     notes: str
     workout_exercise_id: int
+
+
+class UpdateWorkoutSetPayload(BaseModel):
+    reps: int | None = None
+    weight: int | None = None
+    set_type: SetType | None = None
+    order_index: int | None = None
+    notes: str | None = None
