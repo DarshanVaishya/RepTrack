@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
 from sqlalchemy import Column, DateTime, Enum, Integer, String, func
-from sqlalchemy.orm import deferred
+from sqlalchemy.orm import deferred, relationship
 from app.database import Base
+from app.models.workout import Workout
 
 
 class UserRole(PyEnum):
@@ -25,4 +26,7 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
+    )
+    workouts = relationship(
+        "Workout", back_populates="user", cascade="all, delete-orphan"
     )
