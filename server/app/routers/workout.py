@@ -17,7 +17,7 @@ def create_workout(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    new_workout = WorkoutService.create_workout(data, db)
+    new_workout = WorkoutService.create_workout(data, current_user, db)
     return new_workout
 
 

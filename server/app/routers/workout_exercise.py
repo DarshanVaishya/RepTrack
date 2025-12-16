@@ -11,7 +11,7 @@ from app.utils.auth import get_current_user
 from app.services.workout_exercise_service import WorkoutExerciseService
 
 
-router = APIRouter(prefix="/workout_exercise", tags=["workout_exercise"])
+router = APIRouter(prefix="/workout/{workout_id}/exercise", tags=["workout_exercise"])
 
 
 @router.post("")
@@ -51,5 +51,5 @@ def delete_workout_exercise(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    exercise = WorkoutExerciseService.delete_workout_exercisse(exercise_id, db)
+    exercise = WorkoutExerciseService.delete_workout_exercise(exercise_id, db)
     return exercise

@@ -8,7 +8,9 @@ from app.services.workout_set_service import WorkoutSetService
 from app.utils.auth import get_current_user
 
 
-router = APIRouter(prefix="/sets", tags=["sets"])
+router = APIRouter(
+    prefix="/workout/{workout_id}/exercise/{exercise_id}/set", tags=["sets"]
+)
 
 
 @router.post("")
@@ -48,5 +50,5 @@ def update_workout_set(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    set = WorkoutSetService.update_workout(set_id, data, db)
+    set = WorkoutSetService.update_workout_set(set_id, data, db)
     return set

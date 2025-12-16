@@ -6,7 +6,7 @@ from app.schemas.workout_exercise import (
     CreateWorkoutExercisePayload,
     UpdateWorkoutExercisePayload,
 )
-from app.models import WorkoutExercise
+from app.models import Exercise, WorkoutExercise
 from app.utils.logger import logger
 
 
@@ -15,6 +15,16 @@ class WorkoutExerciseService:
     def create_workout_exercise(data: CreateWorkoutExercisePayload, db: Session):
         try:
             data_dict = data.model_dump()
+            exercise = (
+                db.query(Exercise)
+                .filter(Exercise.id == data_dict["exercise_id"])
+                .first()
+            )
+            if not exercise:
+                raise HTTPException(
+                    status_code=404, detail="Catalog exercise not found"
+                )
+
             logger.debug(f"Creating workout exercise with data: {data_dict}")
 
             new_workout_exercise = WorkoutExercise(**data_dict)
@@ -27,6 +37,8 @@ class WorkoutExerciseService:
             )
             return new_workout_exercise
 
+        except HTTPException:
+            raise
         except IntegrityError as e:
             db.rollback()
             logger.error(f"Integrity error creating workout exercise: {str(e)}")
