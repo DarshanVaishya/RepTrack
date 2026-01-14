@@ -13,11 +13,18 @@ from app.schemas.workout_set import (
 from app.services.workout_set_service import WorkoutSetService
 from app.utils.auth import get_current_user
 from app.utils.formatter import format_response
+from fastapi_throttle import RateLimiter
+import os
 
 
 router = APIRouter(
     prefix="/workout/{workout_id}/exercise/{exercise_id}/set", tags=["sets"]
 )
+if os.getenv("TESTING"):
+    router.dependencies = []
+else:
+    limiter = RateLimiter(times=300, seconds=60)
+    router.dependencies = [Depends(limiter)]
 
 
 @router.post("", response_model=WorkoutSetResponseWithMsg, status_code=201)

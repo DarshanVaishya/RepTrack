@@ -12,8 +12,15 @@ from app.utils.auth import get_current_user
 from app.utils.formatter import format_response
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from fastapi_throttle import RateLimiter
+import os
 
 router = APIRouter(prefix="/exercises", tags=["exercises"])
+if os.getenv("TESTING"):
+    router.dependencies = []
+else:
+    exercise_limiter = RateLimiter(times=60, seconds=60)
+    router.dependencies = [Depends(exercise_limiter)]
 
 
 @router.post("", response_model=ExerciseResponse, status_code=201)

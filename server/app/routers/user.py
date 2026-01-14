@@ -14,9 +14,16 @@ from app.schemas.user import (
 from app.models import User
 from app.utils.auth import get_current_user
 from app.utils.formatter import format_response
+from fastapi_throttle import RateLimiter
+import os
 
 
 router = APIRouter(prefix="/users", tags=["users"])
+if os.getenv("TESTING"):
+    router.dependencies = []
+else:
+    limiter = RateLimiter(times=30, seconds=60)
+    router.dependencies = [Depends(limiter)]
 
 
 @router.post("", response_model=UserResponseWithMsg, status_code=201)

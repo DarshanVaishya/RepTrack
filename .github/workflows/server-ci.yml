@@ -64,9 +64,11 @@ jobs:
         alembic stamp head
 
     - name: Run pytest (autogenerate creates tables)
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/RepTrack
+        SECRET_KEY: test-secret-key-for-ci
+        TESTING: true
       run: |
         cd server
-        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RepTrack
-        export SECRET_KEY="test-secret-key-for-ci"
         pytest tests/ -v
 
