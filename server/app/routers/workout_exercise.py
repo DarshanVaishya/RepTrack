@@ -14,11 +14,15 @@ from app.utils.auth import get_current_user
 from app.services.workout_exercise_service import WorkoutExerciseService
 from app.utils.formatter import format_response
 from fastapi_throttle import RateLimiter
+import os
 
 
 router = APIRouter(prefix="/workout/{workout_id}/exercise", tags=["workout_exercise"])
-limiter = RateLimiter(times=120, seconds=60)
-router.dependencies = [Depends(limiter)]
+if os.getenv("TESTING"):
+    router.dependencies = []
+else:
+    limiter = RateLimiter(times=120, seconds=60)
+    router.dependencies = [Depends(limiter)]
 
 
 @router.post("", response_model=WorkoutExerciseResponse, status_code=201)
