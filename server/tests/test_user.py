@@ -15,7 +15,7 @@ def test_create_user(client):
     )
 
     assert response.status_code == 201
-    data = response.json()
+    data = response.json()["data"]
     assert data["name"] == "John Doe"
     assert data["email"] == "john@example.com"
     assert "id" in data
@@ -25,7 +25,7 @@ def test_get_all_users(authenticated_client):
     """Test to check if fetching all users works"""
     response = authenticated_client("GET", "/users")
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["data"]
     assert isinstance(data, list)
     assert len(data) >= 1
 
@@ -43,11 +43,11 @@ def test_get_user_by_id(authenticated_client):
         },
     )
     assert create_response.status_code == 201
-    user_id = create_response.json()["id"]
+    user_id = create_response.json()["data"]["id"]
 
     response = authenticated_client("GET", f"/users/{user_id}")
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["data"]
     assert data["id"] == user_id
     assert data["email"] == "john@example.com"
 
@@ -63,7 +63,7 @@ def test_duplicate_user(client):
             "role": "user",
         },
     )
-    assert first_response.status_code == 200
+    assert first_response.status_code == 201
 
     response = client.post(
         "/users",
@@ -113,7 +113,7 @@ def test_delete_user(authenticated_client):
         },
     )
     assert create_response.status_code == 201
-    user_id = create_response.json()["id"]
+    user_id = create_response.json()["data"]["id"]
 
     response = authenticated_client("DELETE", f"/users/{user_id}")
     assert response.status_code == 200
@@ -131,7 +131,7 @@ def test_update_user(authenticated_client):
         },
     )
     assert create_response.status_code == 201
-    user_id = create_response.json()["id"]
+    user_id = create_response.json()["data"]["id"]
 
     response = authenticated_client(
         "PUT",
@@ -145,7 +145,7 @@ def test_update_user(authenticated_client):
     )
 
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["data"]
     assert data["name"] == "John Doe"
     assert data["email"] == "john@example.com"
     assert data["role"] == "user"
@@ -162,7 +162,7 @@ def test_login_success(client):
             "role": "user",
         },
     )
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
     response = client.post(
         "/users/login",

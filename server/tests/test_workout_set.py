@@ -21,8 +21,8 @@ def _create_workout_and_exercise(authenticated_client):
             "equipment": "barbell",
         },
     )
-    assert exercise_resp.status_code == status.HTTP_200_OK
-    exercise_id = exercise_resp.json()["id"]
+    assert exercise_resp.status_code == 201
+    exercise_id = exercise_resp.json()["data"]["id"]
 
     # 2) Create workout
     workout_resp = authenticated_client(
@@ -30,8 +30,8 @@ def _create_workout_and_exercise(authenticated_client):
         "/workout",
         json={"name": "Upper body", "notes": "Test workout", "user_id": 1},
     )
-    assert workout_resp.status_code == status.HTTP_200_OK
-    workout_id = workout_resp.json()["id"]
+    assert workout_resp.status_code == 201
+    workout_id = workout_resp.json()["data"]["id"]
 
     # 3) Create workout_exercise
     we_resp = authenticated_client(
@@ -44,8 +44,8 @@ def _create_workout_and_exercise(authenticated_client):
             "workout_id": workout_id,
         },
     )
-    assert we_resp.status_code == status.HTTP_200_OK
-    workout_exercise_id = we_resp.json()["id"]
+    assert we_resp.status_code == 201
+    workout_exercise_id = we_resp.json()["data"]["id"]
 
     return workout_id, exercise_id, workout_exercise_id
 
@@ -68,8 +68,8 @@ def test_create_workout_set(authenticated_client):
             "workout_exercise_id": workout_exercise_id,
         },
     )
-    assert resp.status_code == status.HTTP_200_OK
-    data = resp.json()
+    assert resp.status_code == 201
+    data = resp.json()["data"]
     assert data["reps"] == 10
     assert data["weight"] == 100
     assert data["set_type"] == "normal"
@@ -94,15 +94,15 @@ def test_get_workout_set_by_id(authenticated_client):
             "workout_exercise_id": workout_exercise_id,
         },
     )
-    assert create_resp.status_code == status.HTTP_200_OK
-    set_id = create_resp.json()["id"]
+    assert create_resp.status_code == 201
+    set_id = create_resp.json()["data"]["id"]
 
     get_resp = authenticated_client(
         "GET",
         f"/workout/{workout_id}/exercise/{exercise_id}/set/{set_id}",
     )
-    assert get_resp.status_code == status.HTTP_200_OK
-    data = get_resp.json()
+    assert get_resp.status_code == 200
+    data = get_resp.json()["data"]
     assert data["id"] == set_id
     assert data["set_type"] == "failure"
 
@@ -138,8 +138,8 @@ def test_update_workout_set(authenticated_client):
             "workout_exercise_id": workout_exercise_id,
         },
     )
-    assert create_resp.status_code == status.HTTP_200_OK
-    set_id = create_resp.json()["id"]
+    assert create_resp.status_code == 201
+    set_id = create_resp.json()["data"]["id"]
 
     update_resp = authenticated_client(
         "PUT",
@@ -150,8 +150,8 @@ def test_update_workout_set(authenticated_client):
             "notes": "Updated notes",
         },
     )
-    assert update_resp.status_code == status.HTTP_200_OK
-    data = update_resp.json()
+    assert update_resp.status_code == 200
+    data = update_resp.json()["data"]
     assert data["reps"] == 12
     assert data["weight"] == 110
     assert data["notes"] == "Updated notes"
@@ -175,8 +175,8 @@ def test_update_workout_set_no_fields(authenticated_client):
             "workout_exercise_id": workout_exercise_id,
         },
     )
-    assert create_resp.status_code == status.HTTP_200_OK
-    set_id = create_resp.json()["id"]
+    assert create_resp.status_code == 201
+    set_id = create_resp.json()["data"]["id"]
 
     update_resp = authenticated_client(
         "PUT",
@@ -205,14 +205,14 @@ def test_delete_workout_set(authenticated_client):
             "workout_exercise_id": workout_exercise_id,
         },
     )
-    assert create_resp.status_code == status.HTTP_200_OK
-    set_id = create_resp.json()["id"]
+    assert create_resp.status_code == 201
+    set_id = create_resp.json()["data"]["id"]
 
     delete_resp = authenticated_client(
         "DELETE",
         f"/workout/{workout_id}/exercise/{exercise_id}/set/{set_id}",
     )
-    assert delete_resp.status_code == status.HTTP_200_OK
+    assert delete_resp.status_code == 200
 
     get_resp = authenticated_client(
         "GET",

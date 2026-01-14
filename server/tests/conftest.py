@@ -74,6 +74,6 @@ def created_exercise(authenticated_client):
         },
     )
     assert create_response.status_code == 201
-    exercise_id = create_response.json()["id"]
+    exercise_id = create_response.json()["data"]["id"]
 
     return authenticated_client, exercise_id

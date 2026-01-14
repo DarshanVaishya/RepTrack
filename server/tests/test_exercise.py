@@ -10,7 +10,7 @@ def test_create_exercise(authenticated_client):
             "equipment": "cable_machine",
         },
     )
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
 
 
 def test_create_exercise_wrong_info(authenticated_client):
@@ -68,7 +68,7 @@ def test_get_all_exercises(created_exercise):
     )
 
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["data"]
     assert isinstance(data, list)
     assert len(data) >= 1
 
@@ -79,7 +79,7 @@ def test_get_exercise_by_id(created_exercise):
     response = authenticated_client("GET", f"/exercises/{exercise_id}")
 
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["data"]
     assert isinstance(data, dict)
 
 
@@ -104,7 +104,7 @@ def test_update_exercise(created_exercise):
         },
     )
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()["data"]
     assert data["name"] == "Chest Press"
     assert data["description"] == "Updated description"
     assert data["muscle_group"] == "chest"
