@@ -13,9 +13,12 @@ from app.schemas.workout import (
 )
 from app.services.workout_service import WorkoutService
 from app.utils.formatter import format_response
+from fastapi_throttle import RateLimiter
 
 
 router = APIRouter(prefix="/workout", tags=["workout"])
+limiter = RateLimiter(times=120, seconds=60)
+router.dependencies = [Depends(limiter)]
 
 
 @router.post("", response_model=WorkoutResponseWithMsg, status_code=201)
