@@ -5,15 +5,19 @@ from sqlalchemy.orm import Session
 from app.schemas.workout_set import CreateWorkoutSetPayload, UpdateWorkoutSetPayload
 from app.models.workout_set import WorkoutSet
 from app.utils.logger import logger
+from app.services.workout_exercise_service import WorkoutExerciseService
 
 
 class WorkoutSetService:
     @staticmethod
-    def create_workout_set(data: CreateWorkoutSetPayload, db: Session):
+    def create_workout_set(
+        exercise_id: int, data: CreateWorkoutSetPayload, db: Session
+    ):
         try:
             data_dict = data.model_dump()
             logger.debug(f"Creating workout set with data: {data_dict}")
 
+            data_dict["workout_exercise_id"] = exercise_id
             new_set = WorkoutSet(**data_dict)
             db.add(new_set)
             db.commit()
@@ -65,6 +69,36 @@ class WorkoutSetService:
             )
         except Exception as e:
             logger.error(f"Unexpected error fetching workout set {set_id}: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Internal server error",
+            )
+
+    @staticmethod
+    def get_all_workout_sets(exercise_id: int, db: Session):
+        try:
+            exercise = WorkoutExerciseService.get_workout_exercise(exercise_id, db)
+            sets = exercise.sets
+
+            logger.info(
+                f"Fetched {len(sets)} sets for workout exercise ID: {exercise_id}"
+            )
+            return sets
+
+        except HTTPException:
+            raise
+        except SQLAlchemyError as e:
+            logger.error(
+                f"Database error fetching workout sets for exercise {exercise_id}: {str(e)}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database error while fetching workout sets",
+            )
+        except Exception as e:
+            logger.error(
+                f"Unexpected error fetching workout sets for exercise {exercise_id}: {str(e)}"
+            )
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Internal server error",

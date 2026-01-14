@@ -55,18 +55,21 @@ class WorkoutService:
     def get_all_workouts_for_user(current_user: User, db: Session):
         try:
             logger.debug(f"Fetching workouts for user {current_user.id}")
+            # workouts = (
+            #     db.query(Workout)
+            #     .filter(Workout.user_id == current_user.id)
+            #     .options(
+            #         joinedload(Workout.workout_exercises).joinedload(
+            #             WorkoutExercise.sets
+            #         ),
+            #         joinedload(Workout.workout_exercises).joinedload(
+            #             WorkoutExercise.exercise
+            #         ),
+            #     )
+            #     .all()
+            # )
             workouts = (
-                db.query(Workout)
-                .filter(Workout.user_id == current_user.id)
-                .options(
-                    joinedload(Workout.workout_exercises).joinedload(
-                        WorkoutExercise.sets
-                    ),
-                    joinedload(Workout.workout_exercises).joinedload(
-                        WorkoutExercise.exercise
-                    ),
-                )
-                .all()
+                db.query(Workout).filter(Workout.user_id == current_user.id).all()
             )
             logger.info(f"Fetched {len(workouts)} workouts for user {current_user.id}")
             return workouts

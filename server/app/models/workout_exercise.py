@@ -1,9 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Enum
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from enum import Enum as PyEnum
 from app.database import Base
-from app.models.exercise import MuscleGroup, Equipment
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class WorkoutExercise(Base):

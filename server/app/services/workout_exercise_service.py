@@ -6,15 +6,18 @@ from app.schemas.workout_exercise import (
     CreateWorkoutExercisePayload,
     UpdateWorkoutExercisePayload,
 )
-from app.models import Exercise, WorkoutExercise
+from app.models import Exercise, User, WorkoutExercise
 from app.utils.logger import logger
+from app.services.workout_service import WorkoutService
 
 
 class WorkoutExerciseService:
     @staticmethod
+    # TODO: Use the workout_id from the url
     def create_workout_exercise(data: CreateWorkoutExercisePayload, db: Session):
         try:
             data_dict = data.model_dump()
+            # TODO: Also check if workout exists before moving forward
             exercise = (
                 db.query(Exercise)
                 .filter(Exercise.id == data_dict["exercise_id"])
@@ -60,6 +63,12 @@ class WorkoutExerciseService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Internal server error",
             )
+
+    @staticmethod
+    def get_all_workout_exercises(workout_id: int, current_user: User, db: Session):
+        workout = WorkoutService.get_workout_by_id(workout_id, db)
+        exercises = workout.workout_exercises
+        return exercises
 
     @staticmethod
     def get_workout_exercise(exercise_id: int, db: Session):

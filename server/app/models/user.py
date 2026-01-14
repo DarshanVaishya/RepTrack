@@ -3,7 +3,6 @@ from enum import Enum as PyEnum
 from sqlalchemy import Column, DateTime, Enum, Integer, String, func
 from sqlalchemy.orm import deferred, relationship
 from app.database import Base
-from app.models.workout import Workout
 
 
 class UserRole(PyEnum):
