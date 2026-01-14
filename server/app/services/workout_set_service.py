@@ -13,6 +13,27 @@ class WorkoutSetService:
     def create_workout_set(
         exercise_id: int, data: CreateWorkoutSetPayload, db: Session
     ):
+        """
+        Create a new workout set for a specific workout exercise.
+
+        Args:
+            exercise_id (int): The ID of the associated workout exercise.
+            data (CreateWorkoutSetPayload): The payload containing set details (e.g., reps, weight, duration).
+            db (Session): The active SQLAlchemy database session.
+
+        Returns:
+            WorkoutSet: The newly created workout set instance.
+
+        Raises:
+            HTTPException:
+                - 400: If provided data violates constraints.
+                - 500: For database or unexpected internal errors.
+
+        Logging:
+            - Debug: When attempting to create a set.
+            - Info: After successful creation.
+            - Error: On integrity, SQL, or unexpected issues.
+        """
         try:
             data_dict = data.model_dump()
             logger.debug(f"Creating workout set with data: {data_dict}")
@@ -50,6 +71,24 @@ class WorkoutSetService:
 
     @staticmethod
     def get_workout_set_by_id(set_id: int, db: Session):
+        """
+        Retrieve a single workout set by its unique ID.
+
+        Args:
+            set_id (int): The ID of the set to retrieve.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            WorkoutSet: The retrieved set object.
+
+        Raises:
+            HTTPException:
+                - 404: If the set does not exist.
+                - 500: On database or internal server errors.
+
+        Logging:
+            - Error: For database or unexpected failures.
+        """
         try:
             set = db.query(WorkoutSet).filter(WorkoutSet.id == set_id).first()
             if set is None:
@@ -76,6 +115,25 @@ class WorkoutSetService:
 
     @staticmethod
     def get_all_workout_sets(exercise_id: int, db: Session):
+        """
+        Retrieve all workout sets associated with a specific workout exercise.
+
+        Args:
+            exercise_id (int): The ID of the workout exercise whose sets should be fetched.
+            db (Session): The active SQLAlchemy database session.
+
+        Returns:
+            list[WorkoutSet]: All sets belonging to the specified exercise.
+
+        Raises:
+            HTTPException:
+                - 404: If the exercise is not found.
+                - 500: On SQL or internal processing errors.
+
+        Logging:
+            - Info: Lists total fetched sets.
+            - Error: For database or unexpected issues.
+        """
         try:
             exercise = WorkoutExerciseService.get_workout_exercise(exercise_id, db)
             sets = exercise.sets
@@ -106,6 +164,25 @@ class WorkoutSetService:
 
     @staticmethod
     def delete_workout_set(set_id: int, db: Session):
+        """
+        Delete a workout set by its ID.
+
+        Args:
+            set_id (int): The ID of the workout set to delete.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            WorkoutSet: The deleted workout set instance.
+
+        Raises:
+            HTTPException:
+                - 404: If the set does not exist.
+                - 500: On database or internal errors.
+
+        Logging:
+            - Info: On successful deletion.
+            - Error: On SQL or transactional failures.
+        """
         try:
             set = WorkoutSetService.get_workout_set_by_id(set_id, db)
             db.delete(set)
@@ -133,6 +210,28 @@ class WorkoutSetService:
 
     @staticmethod
     def update_workout_set(set_id: int, data: UpdateWorkoutSetPayload, db: Session):
+        """
+        Update an existing workout set with new values.
+
+        Args:
+            set_id (int): The ID of the set to update.
+            data (UpdateWorkoutSetPayload): The payload containing updated set values.
+            db (Session): The active SQLAlchemy database session.
+
+        Returns:
+            WorkoutSet: The updated workout set object.
+
+        Raises:
+            HTTPException:
+                - 400: If no updated fields were provided.
+                - 404: If the workout set does not exist.
+                - 500: For database or internal system errors.
+
+        Logging:
+            - Debug: Before updates, listing modified fields.
+            - Info: On success.
+            - Error: On integrity or SQL conflicts.
+        """
         try:
             set = WorkoutSetService.get_workout_set_by_id(set_id, db)
             update_dict = data.model_dump(exclude_unset=True)

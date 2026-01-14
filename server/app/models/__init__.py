@@ -5,5 +5,3 @@ from app.models.workout_exercise import WorkoutExercise
 from app.models.workout_set import WorkoutSet
 
 __all__ = ["User", "Exercise", "Workout", "WorkoutExercise", "WorkoutSet"]
-
-# DATABASE_URL=postgresql+psycopg2://postgres:1234@localhost/RepTrack

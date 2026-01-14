@@ -12,6 +12,26 @@ from app.utils.auth import create_access_token
 class UserService:
     @staticmethod
     def create_new_user(user_data: CreateUserPayload, db: Session):
+        """
+        Create a new user account.
+
+        Args:
+            user_data (CreateUserPayload): The payload containing user information.
+            db (Session): The active SQLAlchemy database session.
+
+        Returns:
+            User: The newly created user object.
+
+        Raises:
+            HTTPException:
+                - 400: If the email already exists or password is too short.
+                - 500: If a database or internal error occurs.
+
+        Logging:
+            - Debug: When starting user creation.
+            - Info: On successful user creation.
+            - Error: On integrity or database exceptions.
+        """
         user_dict = user_data.model_dump(exclude_unset=True)
         try:
             email = user_dict["email"].lower()
@@ -71,7 +91,25 @@ class UserService:
             )
 
     @staticmethod
-    def get_all_users(db: Session):
+    def get_all_users(current_user: User, db: Session):
+        """
+        Retrieve all registered users.
+
+        Args:
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            list[User]: A list of all user records.
+
+        Raises:
+            HTTPException:
+                - 500: If a database or internal error occurs.
+
+        Logging:
+            - Debug: On start of user retrieval.
+            - Info: On successful fetch.
+            - Error: On database-related issues.
+        """
         try:
             logger.debug("Fetching all users")
             users = db.query(User).all()
@@ -86,6 +124,26 @@ class UserService:
 
     @staticmethod
     def get_user_by_id(user_id: int, db: Session):
+        """
+        Retrieve a user by their unique ID.
+
+        Args:
+            user_id (int): The unique identifier of the user.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            User: The user object if found.
+
+        Raises:
+            HTTPException:
+                - 404: If no user is found with the provided ID.
+                - 500: On database or internal server errors.
+
+        Logging:
+            - Debug: On retrieval attempt.
+            - Warning: If user not found.
+            - Error: On SQL errors.
+        """
         try:
             logger.debug(f"Fetching user ID: {user_id}")
             user = db.query(User).filter(User.id == user_id).first()
@@ -105,8 +163,37 @@ class UserService:
             )
 
     @staticmethod
-    def update_user_details(user_id: int, update_data: UpdateUserPayload, db: Session):
+    def update_user_details(
+        user_id: int, update_data: UpdateUserPayload, current_user: User, db: Session
+    ):
+        """
+        Update an existing user's account details.
+
+        Args:
+            user_id (int): The ID of the user to update.
+            update_data (UpdateUserPayload): The fields to update.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            User: The updated user object.
+
+        Raises:
+            HTTPException:
+                - 400: If no fields are provided or if email/password is invalid.
+                - 404: If the user does not exist.
+                - 500: For database or internal errors.
+
+        Logging:
+            - Debug: When starting the update and listing modified fields.
+            - Info: On successful update.
+            - Error: On integrity or SQL exceptions.
+        """
         try:
+            if current_user.role is not UserRole.ADMIN or current_user.id != user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Only admin or account owner can access this method",
+                )
             user = UserService.get_user_by_id(user_id, db)
             update_dict = update_data.model_dump(exclude_unset=True)
 
@@ -175,8 +262,32 @@ class UserService:
             )
 
     @staticmethod
-    def delete_user(user_id: int, db: Session):
+    def delete_user(user_id: int, current_user: User, db: Session):
+        """
+        Delete a user account from the system.
+
+        Args:
+            user_id (int): The ID of the user to delete.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            User: The deleted user object.
+
+        Raises:
+            HTTPException:
+                - 404: If the user does not exist.
+                - 500: On database or internal errors.
+
+        Logging:
+            - Info: On successful deletion.
+            - Error: On SQL or transaction failures.
+        """
         try:
+            if current_user.role is not UserRole.ADMIN or current_user.id != user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Only admin or account owner can access this method",
+                )
             user = UserService.get_user_by_id(user_id, db)
             db.delete(user)
             db.commit()
@@ -203,6 +314,27 @@ class UserService:
 
     @staticmethod
     def login_user(form_data: OAuth2PasswordRequestForm, db: Session):
+        """
+        Authenticate a user and issue a JWT access token.
+
+        Args:
+            form_data (OAuth2PasswordRequestForm): The OAuth2 login form containing username and password.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            TokenResponse: A response containing the JWT token and token type.
+
+        Raises:
+            HTTPException:
+                - 401: For invalid credentials.
+                - 500: For database or internal server errors.
+
+        Logging:
+            - Debug: On login attempt.
+            - Info: On successful authentication.
+            - Warning: On failed login attempts.
+            - Error: On unexpected or database issues.
+        """
         try:
             username = form_data.username.lower()
             logger.debug(f"Login attempt for: {username}")

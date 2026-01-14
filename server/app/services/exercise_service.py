@@ -14,6 +14,28 @@ class ExerciseService:
     def create_exercise(
         exercise_data: CreateExercisePayload, current_user: User, db: Session
     ):
+        """
+        Create a new exercise in the database. Only accessible by admin users.
+
+        Args:
+            exercise_data (CreateExercisePayload): The data payload containing exercise details.
+            current_user (User): The currently authenticated user.
+            db (Session): The active SQLAlchemy session for database operations.
+
+        Returns:
+            Exercise: The newly created exercise object.
+
+        Raises:
+            HTTPException:
+                - 403: If the user is not an admin.
+                - 400: If duplicate or invalid data is provided.
+                - 500: On database or unexpected internal errors.
+
+        Logging:
+            - Debug: When a new exercise is being created.
+            - Info: After successful creation.
+            - Error: On integrity or database failures.
+        """
         if current_user.role is not UserRole.ADMIN:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Admin only method"
@@ -62,6 +84,22 @@ class ExerciseService:
 
     @staticmethod
     def get_all_exercises(db: Session):
+        """
+        Retrieve all available exercises.
+
+        Args:
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            list[Exercise]: A list of all exercise objects available in the database.
+
+        Raises:
+            HTTPException:
+                - 500: If a database or internal error occurs.
+
+        Logging:
+            - Error: If database access fails.
+        """
         try:
             exercises = db.query(Exercise).all()
             return exercises
@@ -74,6 +112,24 @@ class ExerciseService:
 
     @staticmethod
     def get_exercise_by_id(exercise_id: int, db: Session):
+        """
+        Retrieve a specific exercise by its ID.
+
+        Args:
+            exercise_id (int): The unique ID of the exercise to fetch.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            Exercise: The exercise object if found.
+
+        Raises:
+            HTTPException:
+                - 404: If no exercise is found with the given ID.
+                - 500: If a database error occurs.
+
+        Logging:
+            - Error: On database-level issues.
+        """
         try:
             exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
             if not exercise:
@@ -96,6 +152,29 @@ class ExerciseService:
         update_data: UpdateExercisePayload,
         db: Session,
     ):
+        """
+        Update an existing exercise. Only accessible by admin users.
+
+        Args:
+            exercise_id (int): The ID of the exercise to update.
+            current_user (User): The admin user performing the update.
+            update_data (UpdateExercisePayload): The payload with updated field values.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            Exercise: The updated exercise object.
+
+        Raises:
+            HTTPException:
+                - 403: If the user is not an admin.
+                - 400: For invalid or conflicting update data.
+                - 404: If the exercise does not exist.
+                - 500: On database or internal system errors.
+
+        Logging:
+            - Debug: When listing updated fields.
+            - Error: On integrity or database exceptions.
+        """
         try:
             if current_user.role is not UserRole.ADMIN:
                 raise HTTPException(
@@ -145,6 +224,27 @@ class ExerciseService:
 
     @staticmethod
     def delete_exercise(exercise_id: int, current_user: User, db: Session):
+        """
+        Delete an exercise from the database. Only accessible by admin users.
+
+        Args:
+            exercise_id (int): The ID of the exercise to delete.
+            current_user (User): The admin user performing the action.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            Exercise: The deleted exercise object.
+
+        Raises:
+            HTTPException:
+                - 403: If the user is not an admin.
+                - 404: If the exercise does not exist.
+                - 500: On database or unexpected internal errors.
+
+        Logging:
+            - Info: On successful deletion.
+            - Error: On database or internal errors.
+        """
         try:
             if current_user.role is not UserRole.ADMIN:
                 raise HTTPException(

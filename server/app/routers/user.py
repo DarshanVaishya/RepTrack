@@ -36,7 +36,7 @@ def create_new_user(user_data: CreateUserPayload, db: Session = Depends(get_db))
 def get_all_users(
     db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    users = UserService.get_all_users(db)
+    users = UserService.get_all_users(current_user, db)
     return format_response(users)
 
 
@@ -57,7 +57,7 @@ def update_user_details(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    user = UserService.update_user_details(user_id, update_data, db)
+    user = UserService.update_user_details(user_id, update_data, current_user, db)
     return format_response(user, f"Successfully updated user {user_id}")
 
 
@@ -67,7 +67,7 @@ def delete_user(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    user = UserService.delete_user(user_id, db)
+    user = UserService.delete_user(user_id, current_user, db)
     return format_response(user, f"Successfully deleted user {user_id}")
 
 

@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 
     database_url: str
     secret_key: str
+    cors_origins: list[str] = ["http://localhost:8000"]
 
     model_config = SettingsConfigDict(env_file=".env")
 

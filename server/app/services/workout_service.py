@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
-from app.models import User, Workout, WorkoutExercise
+from app.models import User, Workout
 from app.schemas.workout import CreateWorkoutPayload, UpdateWorkoutPayload
 from app.utils.logger import logger
 
@@ -10,8 +10,29 @@ from app.utils.logger import logger
 class WorkoutService:
     @staticmethod
     def create_workout(data: CreateWorkoutPayload, current_user: User, db: Session):
+        """
+        Create a new workout record for the given user.
+
+        Args:
+            data (CreateWorkoutPayload): The payload containing workout details.
+            current_user (User): The user creating the workout.
+            db (Session): The active SQLAlchemy session used for database operations.
+
+        Returns:
+            Workout: The newly created workout instance.
+
+        Raises:
+            HTTPException: If invalid workout data is provided or a database error occurs.
+
+        Logging:
+            - Debug: When starting to create a workout.
+            - Info: When the workout is successfully created.
+            - Error: On integrity or database-related issues.
+        """
         try:
-            data_dict = data.model_dump(exclude_unset=True)
+            data_dict = data.model_dump()
+            if data_dict["notes"] is None:
+                data_dict["notes"] = ""
             data_dict["user_id"] = current_user.id
 
             logger.debug(f"Creating workout for user {current_user.id}: {data_dict}")
@@ -53,6 +74,24 @@ class WorkoutService:
 
     @staticmethod
     def get_all_workouts_for_user(current_user: User, db: Session):
+        """
+        Retrieve all workouts belonging to the specified user.
+
+        Args:
+            current_user (User): The user whose workouts should be fetched.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            list[Workout]: A list of workout objects associated with the user.
+
+        Raises:
+            HTTPException: If a database or internal error occurs.
+
+        Logging:
+            - Debug: When fetching workouts starts.
+            - Info: When workouts are successfully retrieved.
+            - Error: On database or unexpected errors.
+        """
         try:
             logger.debug(f"Fetching workouts for user {current_user.id}")
             # workouts = (
@@ -93,6 +132,22 @@ class WorkoutService:
 
     @staticmethod
     def get_workout_by_id(workout_id: int, db: Session):
+        """
+        Retrieve a single workout by its ID.
+
+        Args:
+            workout_id (int): The ID of the workout to retrieve.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            Workout: The workout object if found.
+
+        Raises:
+            HTTPException:
+                - 400: If the provided workout ID is invalid.
+                - 404: If no workout is found with the given ID.
+                - 500: For database or unexpected server errors.
+        """
         try:
             if workout_id <= 0:
                 raise HTTPException(
@@ -128,6 +183,30 @@ class WorkoutService:
     def update_workout(
         workout_id: int, data: UpdateWorkoutPayload, current_user: User, db: Session
     ):
+        """
+        Update an existing workout owned by the current user.
+
+        Args:
+            workout_id (int): The ID of the workout to update.
+            data (UpdateWorkoutPayload): The update payload containing fields to modify.
+            current_user (User): The user requesting the update.
+            db (Session): The active SQLAlchemy session.
+
+        Returns:
+            Workout: The updated workout object.
+
+        Raises:
+            HTTPException:
+                - 400: If no update fields are provided.
+                - 403: If the user doesn't own the workout.
+                - 404: If the workout does not exist.
+                - 500: For database or internal errors.
+
+        Logging:
+            - Debug: Before performing an update, listing fields being modified.
+            - Info: After a successful update.
+            - Error: On SQL, integrity, or unexpected issues.
+        """
         try:
             workout = WorkoutService.get_workout_by_id(workout_id, db)
             if workout.user_id != current_user.id:
@@ -183,6 +262,27 @@ class WorkoutService:
 
     @staticmethod
     def delete_workout(workout_id: int, current_user: User, db: Session):
+        """
+        Delete a workout if it belongs to the current user.
+
+        Args:
+            workout_id (int): The ID of the workout to delete.
+            current_user (User): The authenticated user requesting deletion.
+            db (Session): The current SQLAlchemy session.
+
+        Returns:
+            Workout: The deleted workout object.
+
+        Raises:
+            HTTPException:
+                - 403: If the user does not own the workout.
+                - 404: If the workout does not exist.
+                - 500: On database or internal failures.
+
+        Logging:
+            - Info: On successful deletion.
+            - Error: On database or unexpected issues.
+        """
         try:
             workout = WorkoutService.get_workout_by_id(workout_id, db)
             if workout.user_id != current_user.id:
@@ -194,7 +294,7 @@ class WorkoutService:
             db.delete(workout)
             db.commit()
             logger.info(f"Deleted workout ID: {workout_id} for user {current_user.id}")
-            return {"detail": "Deleted"}
+            return workout
 
         except HTTPException:
             db.rollback()
