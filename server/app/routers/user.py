@@ -64,7 +64,7 @@ def delete_user(
     return format_response(user, f"Successfully deleted user {user_id}")
 
 
-@router.post("/login")
+@router.post("/login", status_code=200)
 def login_user(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):

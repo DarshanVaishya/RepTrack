@@ -14,7 +14,7 @@ def test_create_user(client):
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
     assert data["name"] == "John Doe"
     assert data["email"] == "john@example.com"
@@ -42,7 +42,7 @@ def test_get_user_by_id(authenticated_client):
             "role": "user",
         },
     )
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
     user_id = create_response.json()["id"]
 
     response = authenticated_client("GET", f"/users/{user_id}")
@@ -112,7 +112,7 @@ def test_delete_user(authenticated_client):
             "role": "user",
         },
     )
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
     user_id = create_response.json()["id"]
 
     response = authenticated_client("DELETE", f"/users/{user_id}")
@@ -130,7 +130,7 @@ def test_update_user(authenticated_client):
             "role": "coach",
         },
     )
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
     user_id = create_response.json()["id"]
 
     response = authenticated_client(

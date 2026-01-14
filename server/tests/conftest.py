@@ -44,7 +44,7 @@ def authenticated_client(client):
             "role": "admin",
         },
     )
-    assert user_response.status_code == 200
+    assert user_response.status_code == 201
 
     login_response = client.post(
         "/users/login", data={"username": email, "password": "password123"}
@@ -73,7 +73,7 @@ def created_exercise(authenticated_client):
             "equipment": "cable_machine",
         },
     )
-    assert create_response.status_code == 200
+    assert create_response.status_code == 201
     exercise_id = create_response.json()["id"]
 
     return authenticated_client, exercise_id
