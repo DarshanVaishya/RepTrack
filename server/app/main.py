@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
 from app.config import get_settings
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from app.database import get_db
 
 from app.routers import user, exercise, workout_set, workout_exercise, workout
