@@ -1,10 +1,11 @@
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models import User, Workout
 from app.schemas.workout import CreateWorkoutPayload, UpdateWorkoutPayload
 from app.utils.logger import logger
+from app.models.workout_exercise import WorkoutExercise
 
 
 class WorkoutService:
@@ -155,7 +156,18 @@ class WorkoutService:
                     detail="Invalid workout ID",
                 )
 
-            workout = db.query(Workout).filter(Workout.id == workout_id).first()
+            workout = (
+                db.query(Workout)
+                .options(
+                    joinedload(Workout.workout_exercises).options(
+                        joinedload(WorkoutExercise.sets),
+                        joinedload(WorkoutExercise.exercise),
+                    )
+                )
+                .filter(Workout.id == workout_id)
+                .first()
+            )
+
             if not workout:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,

@@ -1,6 +1,8 @@
 from datetime import datetime
 from pydantic import BaseModel
 
+from app.schemas.workout_exercise import WorkoutExerciseSchema
+
 
 class CreateWorkoutPayload(BaseModel):
     name: str
@@ -11,21 +13,15 @@ class UpdateWorkoutPayload(BaseModel):
     name: str | None = None
     notes: str | None = None
 
-    # "notes": "string",
-    # "name": "string",
-    # "created_at": "2025-12-13T13:45:13.087537-05:00",
-    # "id": 1,
-    # "user_id": 3,
-    # "updated_at": "2025-12-13T13:45:13.087537-05:00"
-
 
 class WorkoutSchema(BaseModel):
     id: int
     name: str
-    notes: str
+    notes: str | None
     user_id: int
     created_at: datetime
     updated_at: datetime
+    workout_exercises: list[WorkoutExerciseSchema] | None
 
 
 class AllWorkoutResponse(BaseModel):

@@ -1,5 +1,8 @@
 from pydantic import BaseModel
 
+from app.schemas.workout_set import WorkoutSetSchema
+from app.schemas.exercise import ExerciseSchema
+
 
 class CreateWorkoutExercisePayload(BaseModel):
     exercise_id: int
@@ -19,6 +22,8 @@ class WorkoutExerciseSchema(BaseModel):
     order_index: int
     exercise_id: int
     workout_id: int
+    sets: list[WorkoutSetSchema] | None
+    exercise: ExerciseSchema
 
 
 class AllWorkoutExercisesResponse(BaseModel):

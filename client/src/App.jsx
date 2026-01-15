@@ -1,24 +1,40 @@
-import { useState } from 'react'
 import './index.css'
+import { Route, Routes } from 'react-router-dom'
+import LoginEl from './pages/loginEl'
+import { useEffect } from 'react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import HomeEl from './pages/homeEl';
+import WorkoutEl from './pages/workoutEl';
 
 function App() {
-	const [count, setCount] = useState(0)
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      try {
+        const data = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+        if (data.exp && data.exp < currentTime) {
+          localStorage.removeItem("accessToken");
+          axios.defaults.headers.common['Authorization'] = undefined;
+        } else {
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
+      } catch (e) {
+        console.error("Failed to decode token:", e);
+        localStorage.removeItem("accessToken");
+        axios.defaults.headers.common['Authorization'] = undefined;
+      }
+    }
+  }, []);
 
-	return (
-		<div className='container mx-auto'>
-			<div>
-				<button className="bg-amber-300 p-5 rounded hover:bg-amber-500 transition-colors" onClick={() => setCount((count) => count + 1)}>
-					count is {count}
-				</button>
-				<p>
-					Edit <code>src/App.jsx</code> and save to test HMR
-				</p>
-			</div>
-			<p className="read-the-docs">
-				Click on the Vite and React logos to learn more
-			</p>
-		</div>
-	)
+  return (
+    <Routes>
+      <Route path="" element={<LoginEl />} />
+      <Route path="/workouts" element={<HomeEl />} />
+      <Route path="/workouts/:workout_id" element={<WorkoutEl />} />
+    </Routes>
+  )
 }
 
 export default App
