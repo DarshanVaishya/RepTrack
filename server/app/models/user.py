@@ -18,7 +18,11 @@ class User(Base):
     name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     password = deferred(Column(String(255), nullable=False))
-    role = Column(Enum(UserRole), nullable=False, default=UserRole.USER)
+    role = Column(
+        Enum(UserRole, name="userrole", create_type=False),
+        nullable=False,
+        default=UserRole.USER,
+    )
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(
         DateTime(timezone=True),

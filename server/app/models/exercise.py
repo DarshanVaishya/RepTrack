@@ -33,6 +33,8 @@ class Exercise(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False, unique=True)
     description = Column(String(1000))
-    muscle_group = Column(Enum(MuscleGroup), nullable=True)
+    muscle_group = Column(
+        Enum(MuscleGroup, name="musclegroup", create_type=False), nullable=True
+    )
     equipment = Column(Enum(Equipment), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

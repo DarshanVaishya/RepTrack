@@ -18,7 +18,11 @@ class WorkoutSet(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     reps = Column(Integer, nullable=False)
     weight = Column(Integer, nullable=False)
-    set_type = Column(Enum(SetType), nullable=False, default=SetType.NORMAL)
+    set_type = Column(
+        Enum(SetType, name="settype", create_type=False),
+        nullable=False,
+        default=SetType.NORMAL,
+    )
     order_index = Column(Integer, nullable=False)
     notes = Column(String(500))
     workout_exercise_id = Column(

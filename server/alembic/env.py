@@ -1,10 +1,8 @@
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
+import logging
+from sqlalchemy import engine_from_config, text
 from sqlalchemy import pool
-
 from alembic import context
-
 from app.database import Base
 from app.models import (
     User,
@@ -16,13 +14,14 @@ from app.models import (
     SessionSet,
     WorkoutSession,
 )
-
 from app.config import get_settings
+
+# Set up logging
+logger = logging.getLogger("alembic.env")
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-
 
 # Get database URL from your settings
 settings = get_settings()
@@ -66,7 +65,9 @@ def run_migrations_offline() -> None:
     )
 
     with context.begin_transaction():
+        logger.info("Running migrations in offline mode")
         context.run_migrations()
+        logger.info("Offline migrations completed")
 
 
 def run_migrations_online() -> None:
@@ -83,10 +84,39 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            # Enable better error handling for PostgreSQL
+            compare_type=True,
+            compare_server_default=True,
+        )
+
+        # Get current migration version before running
+        try:
+            current_rev = context.get_context().get_current_revision()
+            logger.info(f"Current database revision: {current_rev}")
+        except Exception as e:
+            logger.warning(f"Could not get current revision: {e}")
 
         with context.begin_transaction():
-            context.run_migrations()
+            logger.info("Starting migration transaction...")
+
+            try:
+                context.run_migrations()
+
+                # Log the new revision after successful migration
+                try:
+                    new_rev = context.get_context().get_current_revision()
+                    logger.info(
+                        f"Migration completed successfully! New revision: {new_rev}"
+                    )
+                except Exception:
+                    logger.info("Migration completed successfully!")
+
+            except Exception as e:
+                logger.error(f"Migration failed with error: {e}")
+                raise
 
 
 if context.is_offline_mode():

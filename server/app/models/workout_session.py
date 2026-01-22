@@ -18,7 +18,9 @@ class WorkoutSession(Base):
     workout_id = Column(Integer, ForeignKey("workout.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     status = Column(
-        Enum(SessionStatus), nullable=False, default=SessionStatus.IN_PROGRESS
+        Enum(SessionStatus, name="sessionstatus", create_type=False),
+        nullable=False,
+        default=SessionStatus.IN_PROGRESS,
     )
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
