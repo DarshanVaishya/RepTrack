@@ -42,8 +42,6 @@ def get_all_workouts_for_user(
     db: Session = Depends(get_db),
 ):
     workouts = WorkoutService.get_all_workouts_for_user(current_user, db)
-    print("PRINT THAY CHE")
-    print(workouts)
     return format_response(workouts)
 
 

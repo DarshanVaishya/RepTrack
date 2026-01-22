@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@layer base {
+  button {
+    @apply px-4 py-2 rounded bg-blue-500 text-white hover:cursor-pointer
+  }
+
+  input {
+    @apply border border-neutral-500 rounded
+  }
+
+  label {
+    @apply mr-5
+  }
+}

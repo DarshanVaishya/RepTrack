@@ -6,7 +6,16 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.database import Base
-from app.models import User, Exercise, WorkoutSet, Workout, WorkoutExercise
+from app.models import (
+    User,
+    Exercise,
+    WorkoutSet,
+    Workout,
+    WorkoutExercise,
+    SessionExercise,
+    SessionSet,
+    WorkoutSession,
+)
 
 from app.config import get_settings
 

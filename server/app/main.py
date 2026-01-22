@@ -1,7 +1,14 @@
 from app.config import get_settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import user, exercise, workout_set, workout_exercise, workout
+from app.routers import (
+    user,
+    exercise,
+    workout_set,
+    workout_exercise,
+    workout,
+    workout_session,
+)
 
 
 settings = get_settings()
@@ -24,3 +31,4 @@ app.include_router(exercise.router)
 app.include_router(workout_set.router)
 app.include_router(workout_exercise.router)
 app.include_router(workout.router)
+app.include_router(workout_session.router)
