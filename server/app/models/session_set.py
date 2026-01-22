@@ -1,5 +1,4 @@
 from enum import Enum as PyEnum
-from os import name
 from app.database import Base
 from sqlalchemy import Column, Enum, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
@@ -28,7 +27,7 @@ class SessionSet(Base):
 
     order_index = Column(Integer, nullable=False)
     status = Column(
-        Enum(SessionSetStatus, name="sesssionsetstatus", create_type=False),
+        Enum(SessionSetStatus, name="sessionsetstatus", create_type=False),
         nullable=False,
         default=SessionSetStatus.PENDING,
     )

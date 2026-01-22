@@ -57,7 +57,7 @@ export default function WorkoutEl() {
 
       <h3>Workout Exercises:</h3>
       {!workout.workout_exercises ? <p>No exercises for this workout.</p> :
-        workout.workout_exercises.map(exercise => <div className="py-2 bg-neutral-200" key={exercise.id}>
+        workout.workout_exercises.map(exercise => <div className="py-2 bg-neutral-200 my-2" key={exercise.id}>
           <p>{exercise.id} {exercise.exercise.name}</p>
           <p>Notes: {exercise.notes && exercise.notes}</p>
           <p>Sets:</p>

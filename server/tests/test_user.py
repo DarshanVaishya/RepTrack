@@ -102,40 +102,14 @@ def test_wrong_role(client):
 
 
 def test_delete_user(authenticated_client):
-    create_response = authenticated_client(
-        "POST",
-        "/users",
-        json={
-            "name": "John Doe",
-            "email": "John@Example.com",
-            "password": "password123",
-            "role": "user",
-        },
-    )
-    assert create_response.status_code == 201
-    user_id = create_response.json()["data"]["id"]
-
-    response = authenticated_client("DELETE", f"/users/{user_id}")
+    response = authenticated_client("DELETE", "/users/1")
     assert response.status_code == 200
 
 
 def test_update_user(authenticated_client):
-    create_response = authenticated_client(
-        "POST",
-        "/users",
-        json={
-            "name": "John Doe",
-            "email": "john@example.com",
-            "password": "password123",
-            "role": "coach",
-        },
-    )
-    assert create_response.status_code == 201
-    user_id = create_response.json()["data"]["id"]
-
     response = authenticated_client(
         "PUT",
-        f"/users/{user_id}",
+        "/users/1",
         json={
             "name": "John Doe",
             "email": "John@Example.com",
