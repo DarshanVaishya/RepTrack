@@ -55,6 +55,7 @@ class WorkoutSessionSchema(BaseModel):
     notes: str | None
     duration_minutes: int | None
     session_exercises: list[SessionExerciseSchema] | None
+    total_volume: int | None
 
 
 class WorkoutSessionResponse(BaseModel):

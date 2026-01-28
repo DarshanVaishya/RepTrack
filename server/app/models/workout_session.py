@@ -25,7 +25,8 @@ class WorkoutSession(Base):
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
     notes = Column(String(1000))
-    duration_minutes = Column(Integer, nullable=True)  # Total workout duration
+    duration_minutes = Column(Integer, nullable=True)
+    total_volume = Column(Integer, nullable=False)
 
     # Relationships
     workout = relationship("Workout")

@@ -286,6 +286,16 @@ class WorkoutSessionService:
                 ).total_seconds() / 60
                 session.duration_minutes = int(duration)
 
+            total_volume = 0
+            for exercise in session.session_exercises:
+                for session_set in exercise.session_sets:
+                    if session_set.actual_reps and session_set.actual_weight:
+                        total_volume += (
+                            session_set.actual_reps * session_set.actual_weight
+                        )
+            session.total_volume = total_volume
+            logger.info(f"Session total volume: {total_volume}")
+
             db.commit()
             db.refresh(session)
 
