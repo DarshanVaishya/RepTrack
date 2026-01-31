@@ -14,6 +14,7 @@ from app.schemas.workout_session import (
 from app.utils.logger import logger
 from app.services.workout_service import WorkoutService
 from app.models.workout_exercise import WorkoutExercise
+from app.services.personal_record_service import PersonalRecordService
 
 
 class WorkoutSessionService:
@@ -298,6 +299,10 @@ class WorkoutSessionService:
 
             db.commit()
             db.refresh(session)
+
+            new_prs = PersonalRecordService.check_and_update_prs_for_session(
+                session=session, db=db
+            )
 
             logger.info(f"Completed session {session_id}")
             return session
