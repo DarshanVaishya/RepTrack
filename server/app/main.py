@@ -8,6 +8,7 @@ from app.routers import (
     workout_exercise,
     workout,
     workout_session,
+    personal_record,
 )
 
 
@@ -32,3 +33,4 @@ app.include_router(workout_set.router)
 app.include_router(workout_exercise.router)
 app.include_router(workout.router)
 app.include_router(workout_session.router)
+app.include_router(personal_record.router)

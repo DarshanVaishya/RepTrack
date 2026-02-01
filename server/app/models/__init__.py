@@ -6,6 +6,7 @@ from app.models.workout_set import WorkoutSet
 from app.models.session_exercise import SessionExercise
 from app.models.session_set import SessionSet
 from app.models.workout_session import WorkoutSession
+from app.models.personal_record import PersonalRecord
 
 __all__ = [
     "User",
@@ -16,4 +17,5 @@ __all__ = [
     "SessionExercise",
     "SessionSet",
     "WorkoutSession",
+    "PersonalRecord",
 ]

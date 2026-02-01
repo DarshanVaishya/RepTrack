@@ -2,6 +2,8 @@ import axios from "axios"
 import { useState } from "react"
 import API_BASE_URL from "../api"
 import { useNavigate } from "react-router-dom"
+import Container from "../utils/container"
+import TextInput from "../utils/TextInput"
 
 export default function LoginEl() {
   const [email, setEmail] = useState("")
@@ -21,18 +23,14 @@ export default function LoginEl() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Email</label>
-        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+    <Container>
+      <div className="flex justify-center items-center min-h-screen">
+        <form onSubmit={handleSubmit} className="bg-gray-100 p-5">
+          <TextInput label="email" value={email} onChange={setEmail} />
+          <TextInput type="password" label="password" value={password} onChange={setPassword} />
+          <button type="submit">Login</button>
+        </form>
       </div>
-
-      <div>
-        <label>Password</label>
-        <input type="text" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-      </div>
-
-      <button type="submit">Login</button>
-    </form>
+    </Container>
   )
 }
