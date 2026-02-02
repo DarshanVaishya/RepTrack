@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import HomeEl from './pages/homeEl';
 import WorkoutEl from './pages/workoutEl';
 import ExercisesEl from './pages/exercisesEl';
+import SessionEl from './pages/sessionEl';
 
 function App() {
   useEffect(() => {
@@ -35,6 +36,7 @@ function App() {
       <Route path="/workouts" element={<HomeEl />} />
       <Route path="/exercises" element={<ExercisesEl />} />
       <Route path="/workouts/:workout_id" element={<WorkoutEl />} />
+      <Route path="/session/:session_id" element={<SessionEl />} />
     </Routes>
   )
 }
