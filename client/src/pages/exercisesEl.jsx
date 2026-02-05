@@ -28,7 +28,6 @@ export default function ExercisesEl() {
       equipment
     })
 
-    console.log(response.data.data)
     setExercises([...exercises, response.data.data])
   }
 

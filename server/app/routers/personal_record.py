@@ -33,6 +33,7 @@ else:
 def get_personal_records(
     exercise_id: Optional[int] = Query(None, description="Filter by exercise ID"),
     pr_type: Optional[PRType] = Query(None, description="Filter by PR type"),
+    session_id: Optional[int] = Query(None, description="Filter by session id"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -44,7 +45,11 @@ def get_personal_records(
     - pr_type: Get PRs of a specific type (max_volume, max_single_set, etc.)
     """
     prs = PersonalRecordService.get_user_prs(
-        user_id=current_user.id, exercise_id=exercise_id, pr_type=pr_type, db=db
+        user_id=current_user.id,
+        exercise_id=exercise_id,
+        pr_type=pr_type,
+        session_id=session_id,
+        db=db,
     )
 
     pr_schemas = []

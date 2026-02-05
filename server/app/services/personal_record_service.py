@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, session
 from sqlalchemy import desc, func
 
 from app.models import WorkoutSession
@@ -171,7 +171,11 @@ class PersonalRecordService:
 
     @staticmethod
     def get_user_prs(
-        user_id: int, exercise_id: Optional[int], pr_type: Optional[PRType], db: Session
+        user_id: int,
+        exercise_id: Optional[int],
+        pr_type: Optional[PRType],
+        session_id: Optional[int],
+        db: Session,
     ) -> list[PersonalRecord]:
         """
         Get personal records for a user.
@@ -193,6 +197,9 @@ class PersonalRecordService:
 
             if pr_type:
                 query = query.filter(PersonalRecord.pr_type == pr_type)
+
+            if session_id:
+                query = query.filter(PersonalRecord.session_id == session_id)
 
             prs = query.order_by(desc(PersonalRecord.achieved_at)).all()
 

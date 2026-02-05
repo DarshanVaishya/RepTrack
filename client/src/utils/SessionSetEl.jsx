@@ -15,6 +15,10 @@ export default function SessionSetEl({ set, session_id }) {
     })
 
     console.log("Set complete", response.data.data)
+    set.actual_reps = reps
+    set.actual_weight = weight
+    setReps("")
+    setWeight("")
   }
 
   return (

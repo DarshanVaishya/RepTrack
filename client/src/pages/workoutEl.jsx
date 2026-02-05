@@ -1,12 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import API_BASE_URL from "../api";
 import SelectInput from "../utils/SelectInput";
 import TextInput from "../utils/TextInput";
 
 export default function WorkoutEl() {
   const { workout_id } = useParams();
+  const navigate = useNavigate()
   const [workout, setWorkout] = useState(null)
   const [exercises, setExercises] = useState(null)
 
@@ -52,6 +53,17 @@ export default function WorkoutEl() {
     })
   }
 
+  const handleStartSession = async e => {
+    e.preventDefault()
+
+    const response = await axios.post(`${API_BASE_URL}/sessions`, {
+      workout_id,
+      notes
+    })
+    const session_id = response.data.data.id
+    navigate(`/sessions/${session_id}`)
+  }
+
   if (workout == null)
     return <h1>Loading...</h1>
 
@@ -59,6 +71,8 @@ export default function WorkoutEl() {
     <div>
       <h1 className="mb-1 text-2xl font-semibold">{workout.name}</h1>
       {workout.notes && <h2>Notes: {workout.notes}</h2>}
+      <input type="text" value={notes} onChange={e => setNotes(e.target.value)} />
+      <button onClick={e => handleStartSession(e)}>Start session</button>
 
       <h3>Workout Exercises:</h3>
       {!workout.workout_exercises ? <p>No exercises for this workout.</p> :

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import API_BASE_URL from "../api";
 import Spinner from "../utils/Spinner";
-import SessionSetEl from "../utils/SessionSetEl";
 import SessionExerciseEl from "../utils/SessionExerciseEl";
+import PrEl from "../utils/PrEl";
 
 
 export default function SessionEl() {
@@ -19,7 +19,6 @@ export default function SessionEl() {
       response => {
         setSession(response.data.data)
         setExercises(response.data.data.session_exercises)
-        console.log(response.data.data)
       })
   }, [session_id])
 
@@ -39,6 +38,11 @@ export default function SessionEl() {
     return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
   };
 
+  const handleSessionEnd = async (action) => {
+    const response = await axios.post(`${API_BASE_URL}/sessions/${session_id}/${action}`)
+    console.log(`Session ${action}: `, response.data.data)
+  }
+
   if (!session || !exercises)
     return <Spinner />
 
@@ -46,12 +50,24 @@ export default function SessionEl() {
     <Container>
       <h1>Session page - {session_id}</h1>
       <p>{session.notes}</p>
-      <p><span>Session Time: {formatTime(elapsed)}</span></p>
+      <p><span>
+        Session Time: {
+          session.completed_at
+            ? formatTime(Math.floor((new Date(session.completed_at).getTime() - new Date(session.started_at).getTime()) / 1000))
+            : formatTime(elapsed)
+        }
+      </span></p>
       <div>
         {exercises.map(e =>
           <SessionExerciseEl key={e.id} sessionExercise={e} session_id={session_id} workout_id={session.workout_id} />
         )}
       </div>
+      {session.status == "in_progress" && <div>
+        <button onClick={() => handleSessionEnd("complete")}>Complete Session</button>
+        <button onClick={() => handleSessionEnd("cancel")}>Cancel Session</button>
+      </div>}
+
+      {session.status == "completed" && <PrEl session_id={session_id} />}
     </Container>
   )
 }

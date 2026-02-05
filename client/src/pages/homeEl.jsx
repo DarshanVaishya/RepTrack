@@ -28,15 +28,12 @@ export default function HomeEl() {
       notes
     })
 
-    console.log(response.data.data)
     const workout = response.data.data
     setWorkouts([...workouts, workout])
   }
 
   const handleDelete = async id => {
-    const response = axios.delete(`${API_BASE_URL}/workout/${id}`)
-    console.log("DELETED")
-    console.log(response.data)
+    await axios.delete(`${API_BASE_URL}/workout/${id}`)
 
     const newWorkouts = workouts.filter(workout => workout.id !== id)
     setWorkouts(newWorkouts)
