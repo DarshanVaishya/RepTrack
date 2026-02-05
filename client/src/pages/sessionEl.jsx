@@ -3,7 +3,7 @@ import Container from "../utils/container";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_BASE_URL from "../api";
-import Spinner from "../utils/Spinner";
+import Spinner from "../utils/spinner";
 import SessionExerciseEl from "../utils/SessionExerciseEl";
 import PrEl from "../utils/PrEl";
 

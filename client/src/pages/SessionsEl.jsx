@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Container from "../utils/container";
 import axios from "axios";
 import API_BASE_URL from "../api";
-import Spinner from "../utils/Spinner";
+import Spinner from "../utils/spinner";
 import SessionsIndividualEl from "../utils/SessionsIndividualEl";
 
 export default function SessionsEl() {

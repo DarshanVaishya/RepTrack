@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SessionSetEl from "./SessionSetEl";
 import API_BASE_URL from "../api";
 import axios from "axios";
-import Spinner from "./Spinner";
+import Spinner from "./spinner";
 
 export default function SessionExerciseEl({ sessionExercise, workout_id, session_id }) {
   const [exercise, setExercise] = useState(null)

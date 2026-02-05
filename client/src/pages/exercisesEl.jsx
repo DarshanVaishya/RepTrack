@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Container from "../utils/container";
-import Spinner from "../utils/Spinner";
+import Spinner from "../utils/spinner";
 import axios from "axios";
 import API_BASE_URL from "../api";
 import TextInput from "../utils/TextInput";

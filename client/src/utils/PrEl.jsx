@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Spinner from "./Spinner"
+import Spinner from "./spinner"
 import axios from "axios"
 import API_BASE_URL from "../api"
 import { Trophy } from "lucide-react"
